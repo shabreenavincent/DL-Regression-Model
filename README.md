@@ -40,19 +40,76 @@ Use the trained model to predict  for a new input value .
 
 ## PROGRAM
 
-### Name:
+### Name: Jagadeeswar Reddy M
 
-### Register Number:
+### Register Number: 212222240059
 
-```python
+```
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Step 1: Generate Dataset
+np.random.seed(42)
+torch.manual_seed(42)
+
+X = np.arange(1, 51, dtype=np.float32).reshape(-1, 1)
+noise = np.random.normal(0, 5, X.shape)
+y = 2 * X + 3 + noise  # y = 2x + 3 with noise
+
+X_tensor = torch.tensor(X, dtype=torch.float32)
+y_tensor = torch.tensor(y, dtype=torch.float32)
+
+# Step 2: Define the Model
 class Model(nn.Module):
     def __init__(self, in_features, out_features):
         super().__init__()
-        #Include your code here
+        self.linear = nn.Linear(in_features, out_features)
+        
+    def forward(self, x):
+        return self.linear(x)
 
+model = Model(1, 1)
 
+# Step 3: Define Loss Function and Optimizer
+criterion = nn.MSELoss()
+optimizer = optim.SGD(model.parameters(), lr=0.001)
 
-# Initialize the Model, Loss Function, and Optimizer
+# Step 4: Train the Model
+epochs = 100
+losses = []
+
+for epoch in range(epochs):
+    optimizer.zero_grad()
+    outputs = model(X_tensor)
+    loss = criterion(outputs, y_tensor)
+    loss.backward()
+    optimizer.step()
+    losses.append(loss.item())
+    if (epoch+1) % 10 == 0:
+        print(f'Epoch {epoch+1}/{epochs}, Loss: {loss.item():.4f}')
+
+# Step 5: Plot Loss Curve
+plt.plot(range(epochs), losses)
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.title('Training Loss vs Iterations')
+plt.show()
+
+# Step 6: Visualize the Best-Fit Line
+predicted = model(X_tensor).detach().numpy()
+plt.scatter(X, y, label='Original Data')
+plt.plot(X, predicted, color='red', label='Best Fit Line')
+plt.legend()
+plt.title('Linear Regression Model')
+plt.show()
+
+# Step 7: Make Predictions
+new_input = torch.tensor([[55.0]])  # Predict for X=55
+predicted_value = model(new_input).item()
+print(f'Prediction for X=55: {predicted_value:.4f}')
 
 ```
 
@@ -61,8 +118,12 @@ Include screenshot of the generated data
 
 ### OUTPUT
 Training Loss Vs Iteration Plot
+
+![image](https://github.com/user-attachments/assets/0b04c4ac-5864-495e-9b24-c0b8d6490644)
+
 Best Fit line plot
-Include your plot here
+
+![image](https://github.com/user-attachments/assets/27deb3af-162c-4367-af69-8f447d6b5de9)
 
 ### New Sample Data Prediction
 Include your sample input and output here
